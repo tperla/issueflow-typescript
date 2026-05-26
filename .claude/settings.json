@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"## Prompt\\n$(date -u +%Y-%m-%dT%H:%M:%SZ)\\nModel: claude-sonnet-4-6\\n\\n$CLAUDE_USER_PROMPT\\n---\" >> .prompts-raw.md"
+            "command": "python -c \"import sys,json,datetime; d=json.load(sys.stdin); open('.claude/logs/prompts-raw.md','a').write('## Prompt\\n'+datetime.datetime.utcnow().isoformat()+'Z\\nModel: claude-sonnet-4-6\\n\\n'+d.get('prompt','')+' \\n---\\n')\""
           }
         ]
       }
