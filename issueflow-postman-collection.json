@@ -450,6 +450,75 @@
       ]
     },
     {
+      "name": "Audit Logs",
+      "item": [
+        {
+          "name": "List Audit Logs (ADMIN only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs"]
+            }
+          }
+        },
+        {
+          "name": "List Audit Logs – filter by entityType (ADMIN only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs?entityType=PROJECT",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs"],
+              "query": [{ "key": "entityType", "value": "PROJECT", "description": "PROJECT | TICKET | COMMENT | USER | ATTACHMENT" }]
+            }
+          }
+        },
+        {
+          "name": "List Audit Logs – filter by action (ADMIN only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs?action=CREATE",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs"],
+              "query": [{ "key": "action", "value": "CREATE", "description": "CREATE | UPDATE | DELETE | RESTORE | AUTO_ASSIGN" }]
+            }
+          }
+        },
+        {
+          "name": "List Audit Logs – filter by actor (ADMIN only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs?actor=USER",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs"],
+              "query": [{ "key": "actor", "value": "USER", "description": "USER | SYSTEM" }]
+            }
+          }
+        },
+        {
+          "name": "List Audit Logs – filter by entityId (ADMIN only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs?entityId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs"],
+              "query": [{ "key": "entityId", "value": "{{projectId}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Comments",
       "item": [
         {
