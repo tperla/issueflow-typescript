@@ -6,6 +6,7 @@ import { HttpExceptionFilter } from './../src/common/filters/http-exception.filt
 
 describe('Users (e2e)', () => {
   let app: INestApplication;
+  let authToken: string;
   let createdUserId: number;
 
   beforeAll(async () => {
@@ -16,7 +17,12 @@ describe('Users (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
     app.useGlobalFilters(new HttpExceptionFilter());
-    await app.init();
+    await app.init(); // onApplicationBootstrap seeds admin automatically
+
+    const loginRes = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ username: 'admin', password: 'admin123' });
+    authToken = loginRes.body.accessToken;
   });
 
   afterAll(async () => {
@@ -26,6 +32,7 @@ describe('Users (e2e)', () => {
   it('POST /users creates a user', async () => {
     const res = await request(app.getHttpServer())
       .post('/users')
+      .set('Authorization', `Bearer ${authToken}`)
       .send({
         username: 'e2euser',
         email: 'e2e@example.com',
@@ -47,6 +54,7 @@ describe('Users (e2e)', () => {
   it('POST /users returns 400 for invalid role', async () => {
     const res = await request(app.getHttpServer())
       .post('/users')
+      .set('Authorization', `Bearer ${authToken}`)
       .send({
         username: 'baduser',
         email: 'bad@example.com',
@@ -60,26 +68,38 @@ describe('Users (e2e)', () => {
   });
 
   it('GET /users returns array', async () => {
-    const res = await request(app.getHttpServer()).get('/users').expect(200);
+    const res = await request(app.getHttpServer())
+      .get('/users')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200);
     expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it('GET /users returns 401 without token', async () => {
+    await request(app.getHttpServer()).get('/users').expect(401);
   });
 
   it('GET /users/:userId returns user', async () => {
     const res = await request(app.getHttpServer())
       .get(`/users/${createdUserId}`)
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(200);
 
     expect(res.body.id).toBe(createdUserId);
   });
 
   it('GET /users/:userId returns 404 for unknown id', async () => {
-    const res = await request(app.getHttpServer()).get('/users/999999').expect(404);
+    const res = await request(app.getHttpServer())
+      .get('/users/999999')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(404);
     expect(res.body).toMatchObject({ statusCode: 404, error: expect.any(String) });
   });
 
   it('POST /users/update/:userId updates user', async () => {
     const res = await request(app.getHttpServer())
       .post(`/users/update/${createdUserId}`)
+      .set('Authorization', `Bearer ${authToken}`)
       .send({ fullName: 'Updated Name' })
       .expect(201);
 
@@ -89,6 +109,7 @@ describe('Users (e2e)', () => {
   it('POST /users/update/:userId returns 404 for unknown id', async () => {
     await request(app.getHttpServer())
       .post('/users/update/999999')
+      .set('Authorization', `Bearer ${authToken}`)
       .send({ fullName: 'X' })
       .expect(404);
   });
@@ -96,12 +117,14 @@ describe('Users (e2e)', () => {
   it('DELETE /users/:userId deletes user', async () => {
     await request(app.getHttpServer())
       .delete(`/users/${createdUserId}`)
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(200);
   });
 
   it('DELETE /users/:userId returns 404 for unknown id', async () => {
     await request(app.getHttpServer())
       .delete('/users/999999')
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(404);
   });
 });

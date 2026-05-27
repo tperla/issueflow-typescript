@@ -83,6 +83,23 @@ All TypeORM entities use class decorators (`@Entity`, `@Column`, `@ManyToOne`, e
 - Logout adds the token to an in-memory `Set` (blacklist) inside `AuthService`
 - A custom `JwtAuthGuard` checks the blacklist before allowing access
 - No DB round-trips for token validation
+- All endpoints (including `/users`) require a valid JWT; unauthenticated requests return 401
+
+---
+
+## 3.1 Startup Admin Seed
+
+**Decision: `OnApplicationBootstrap` hook in `AppService`**
+
+Since all endpoints are JWT-protected, there must be at least one user to log in with on a fresh install. `AppService` implements `OnApplicationBootstrap` and seeds a default admin on every startup if none exists:
+
+- Checks for a user with `SEED_ADMIN_USERNAME` (default: `admin`) via `UsersService.findByUsername()`
+- If not found, creates an ADMIN user with credentials from env vars:
+  - `SEED_ADMIN_USERNAME` — default `admin`
+  - `SEED_ADMIN_EMAIL` — default `admin@issueflow.dev`
+  - `SEED_ADMIN_PASSWORD` — default `admin123`
+- Operation is idempotent: re-running never creates duplicates
+- E2E tests rely on this seed; no manual bootstrap code needed in test setup
 
 ---
 

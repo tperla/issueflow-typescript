@@ -77,6 +77,18 @@ describe('UsersService', () => {
     });
   });
 
+  describe('findByUsername', () => {
+    it('returns user when found', async () => {
+      mockRepo.findOneBy.mockResolvedValue(mockUser);
+      expect(await service.findByUsername('john')).toEqual(mockUser);
+    });
+
+    it('returns null when not found', async () => {
+      mockRepo.findOneBy.mockResolvedValue(null);
+      expect(await service.findByUsername('nobody')).toBeNull();
+    });
+  });
+
   describe('update', () => {
     it('updates and returns user', async () => {
       const updated = { ...mockUser, fullName: 'Jane Doe' };
