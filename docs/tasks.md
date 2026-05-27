@@ -12,13 +12,14 @@ Each task = one branch + one PR. Follow: implement → write tests → `npm run 
 - `src/app.module.ts` — import all feature modules, configure TypeORM, ValidationPipe, HttpExceptionFilter
 - `src/common/filters/http-exception.filter.ts` — global exception filter returning `{ statusCode, message, error }`
 - `src/common/enums/` — `user-role.enum.ts`, `ticket-status.enum.ts`, `ticket-priority.enum.ts`, `ticket-type.enum.ts`, `audit-action.enum.ts`, `audit-actor.enum.ts`, `audit-entity-type.enum.ts`
-- `src/config/typeorm.config.ts` — TypeORM datasource config (host, port, user, password, db, synchronize: true)
+- `src/config/typeorm.config.ts` — TypeORM datasource config using `compose.yml` credentials: `host=localhost, port=5432, username=issueflow, password=issueflow, database=issueflow, synchronize=true`
 - `src/entities/` — all TypeORM entities: `User`, `Project`, `Ticket`, `Comment`, `AuditLog`, `TicketDependency`, `Attachment`
 - `test/setup.ts` — E2E test database setup/teardown helpers
 
 **Acceptance criteria:**
+- `docker compose up -d` starts PostgreSQL successfully
 - App boots without errors (`npm run start:dev`)
-- TypeORM connects to PostgreSQL and auto-creates all tables
+- TypeORM connects using `compose.yml` credentials and auto-creates all tables
 - Global `ValidationPipe` rejects invalid input with 400
 - Global `HttpExceptionFilter` returns consistent `{ statusCode, message, error }` shape
 - All enums defined and exported

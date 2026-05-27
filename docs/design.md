@@ -20,6 +20,30 @@ A shared `DatabaseModule` provides TypeORM repository injection across modules.
 
 ---
 
+## 0. Database
+
+**Stack: PostgreSQL via Docker Compose + TypeORM 0.3.20**
+
+The database is provided by `compose.yml` at the project root. Start it with:
+
+```bash
+docker compose up -d
+```
+
+Connection details (from `compose.yml`):
+
+| Parameter | Value |
+|-----------|-------|
+| host | `localhost` |
+| port | `5432` |
+| username | `issueflow` |
+| password | `issueflow` |
+| database | `issueflow` |
+
+TypeORM is configured in `src/config/typeorm.config.ts` using these values with `synchronize: true` (dev only — schema auto-created on startup). The config is imported into `AppModule` via `TypeOrmModule.forRoot()`.
+
+---
+
 ## 2. Entity Design & Relationships
 
 **Decision: Decorator-based with explicit join table**
