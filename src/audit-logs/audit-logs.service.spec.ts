@@ -6,7 +6,7 @@ import { AuditAction } from '../common/enums/audit-action.enum';
 import { AuditActor } from '../common/enums/audit-actor.enum';
 import { AuditEntityType } from '../common/enums/audit-entity-type.enum';
 
-const mockRepo = { create: jest.fn(), save: jest.fn() };
+const mockRepo = { create: jest.fn(), save: jest.fn(), find: jest.fn() };
 
 describe('AuditLogsService', () => {
   let service: AuditLogsService;
@@ -37,5 +37,60 @@ describe('AuditLogsService', () => {
 
     expect(mockRepo.create).toHaveBeenCalledWith(dto);
     expect(mockRepo.save).toHaveBeenCalledWith(dto);
+  });
+
+  describe('findAll', () => {
+    it('returns all logs when no filters provided', async () => {
+      const logs = [{ id: 1, action: AuditAction.CREATE }];
+      mockRepo.find.mockResolvedValue(logs);
+      const result = await service.findAll();
+      expect(result).toBe(logs);
+      expect(mockRepo.find).toHaveBeenCalledWith({ where: {}, order: { timestamp: 'DESC' } });
+    });
+
+    it('filters by entityType', async () => {
+      mockRepo.find.mockResolvedValue([]);
+      await service.findAll({ entityType: AuditEntityType.TICKET });
+      expect(mockRepo.find).toHaveBeenCalledWith({
+        where: { entityType: AuditEntityType.TICKET },
+        order: { timestamp: 'DESC' },
+      });
+    });
+
+    it('filters by action', async () => {
+      mockRepo.find.mockResolvedValue([]);
+      await service.findAll({ action: AuditAction.DELETE });
+      expect(mockRepo.find).toHaveBeenCalledWith({
+        where: { action: AuditAction.DELETE },
+        order: { timestamp: 'DESC' },
+      });
+    });
+
+    it('filters by actor', async () => {
+      mockRepo.find.mockResolvedValue([]);
+      await service.findAll({ actor: AuditActor.SYSTEM });
+      expect(mockRepo.find).toHaveBeenCalledWith({
+        where: { actor: AuditActor.SYSTEM },
+        order: { timestamp: 'DESC' },
+      });
+    });
+
+    it('filters by entityId', async () => {
+      mockRepo.find.mockResolvedValue([]);
+      await service.findAll({ entityId: 5 });
+      expect(mockRepo.find).toHaveBeenCalledWith({
+        where: { entityId: 5 },
+        order: { timestamp: 'DESC' },
+      });
+    });
+
+    it('combines multiple filters', async () => {
+      mockRepo.find.mockResolvedValue([]);
+      await service.findAll({ entityType: AuditEntityType.PROJECT, action: AuditAction.UPDATE });
+      expect(mockRepo.find).toHaveBeenCalledWith({
+        where: { entityType: AuditEntityType.PROJECT, action: AuditAction.UPDATE },
+        order: { timestamp: 'DESC' },
+      });
+    });
   });
 });
