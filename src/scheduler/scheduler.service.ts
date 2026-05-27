@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -20,6 +20,8 @@ const PRIORITY_UP: Partial<Record<TicketPriority, TicketPriority>> = {
 
 @Injectable()
 export class SchedulerService {
+  private readonly logger = new Logger(SchedulerService.name);
+
   constructor(
     @InjectRepository(Ticket) private readonly ticketRepo: Repository<Ticket>,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
@@ -28,6 +30,8 @@ export class SchedulerService {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async runEscalation(): Promise<void> {
+    this.logger.log('runEscalation started');
+
     const overdueTickets = await this.ticketRepo
       .createQueryBuilder('t')
       .where('t.dueDate IS NOT NULL')
@@ -36,6 +40,8 @@ export class SchedulerService {
       .andWhere('t.status != :done', { done: TicketStatus.DONE })
       .andWhere('t.deletedAt IS NULL')
       .getMany();
+
+    this.logger.log(`Found ${overdueTickets.length} overdue ticket(s) to escalate`);
 
     for (const ticket of overdueTickets) {
       const newPriority = PRIORITY_UP[ticket.priority];
@@ -53,6 +59,8 @@ export class SchedulerService {
         entityId: ticket.id,
         actor: AuditActor.SYSTEM,
       });
+
+      this.logger.log(`Ticket #${ticket.id} escalated: ${ticket.priority} -> ${newPriority}`);
     }
   }
 
