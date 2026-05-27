@@ -1,13 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
+import * as bcrypt from 'bcrypt';
 import { AppModule } from './../src/app.module';
 import { HttpExceptionFilter } from './../src/common/filters/http-exception.filter';
+import { User } from './../src/entities/user.entity';
+import { UserRole } from './../src/common/enums/user-role.enum';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
   let accessToken: string;
-  let createdUserId: number;
+  let seededUserId: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -19,16 +23,20 @@ describe('Auth (e2e)', () => {
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
 
-    const userRes = await request(app.getHttpServer())
-      .post('/users')
-      .send({
+    // Seed test user directly (POST /users is JWT-protected)
+    const userRepo = moduleFixture.get<any>(getRepositoryToken(User));
+    await userRepo.delete({ username: 'authuser' });
+    const passwordHash = await bcrypt.hash('password123', 10);
+    const saved = await userRepo.save(
+      userRepo.create({
         username: 'authuser',
         email: 'authuser@example.com',
         fullName: 'Auth User',
-        role: 'DEVELOPER',
-        password: 'password123',
-      });
-    createdUserId = userRes.body.id;
+        role: UserRole.DEVELOPER,
+        passwordHash,
+      }),
+    );
+    seededUserId = saved.id;
   });
 
   afterAll(async () => {
@@ -69,7 +77,7 @@ describe('Auth (e2e)', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
-    expect(res.body).toMatchObject({ id: createdUserId, username: 'authuser' });
+    expect(res.body).toMatchObject({ id: seededUserId, username: 'authuser' });
   });
 
   it('GET /auth/me without token returns 401', async () => {
