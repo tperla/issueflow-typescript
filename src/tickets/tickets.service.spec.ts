@@ -5,6 +5,7 @@ import { TicketsService } from './tickets.service';
 import { Ticket } from '../entities/ticket.entity';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { TicketDependenciesService } from '../ticket-dependencies/ticket-dependencies.service';
+import { SchedulerService } from '../scheduler/scheduler.service';
 import { TicketStatus } from '../common/enums/ticket-status.enum';
 import { TicketPriority } from '../common/enums/ticket-priority.enum';
 import { TicketType } from '../common/enums/ticket-type.enum';
@@ -48,6 +49,7 @@ describe('TicketsService', () => {
     };
     auditLogsService = { log: jest.fn().mockResolvedValue(undefined) };
     ticketDependenciesService = { hasUnresolvedBlockers: jest.fn().mockResolvedValue(false) };
+    const schedulerService = { autoAssign: jest.fn().mockResolvedValue(undefined) };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -55,6 +57,7 @@ describe('TicketsService', () => {
         { provide: getRepositoryToken(Ticket), useValue: ticketRepo },
         { provide: AuditLogsService, useValue: auditLogsService },
         { provide: TicketDependenciesService, useValue: ticketDependenciesService },
+        { provide: SchedulerService, useValue: schedulerService },
       ],
     }).compile();
 
@@ -95,9 +98,10 @@ describe('TicketsService', () => {
       const ticket = mockTicket({ title: 'New bug' });
       ticketRepo.create.mockReturnValue(ticket);
       ticketRepo.save.mockResolvedValue(ticket);
+      ticketRepo.findOneBy.mockResolvedValue(ticket);
 
       const result = await service.create(dto, 5);
-      expect(result).toBe(ticket);
+      expect(result).toMatchObject({ title: 'New bug' });
       expect(auditLogsService.log).toHaveBeenCalled();
     });
   });
@@ -188,8 +192,10 @@ describe('TicketsService', () => {
   describe('importFromCsv', () => {
     it('returns created/failed counts', async () => {
       const csv = 'title,description,status,priority,type,assigneeId\nBug,desc,TODO,MEDIUM,BUG,\n';
-      ticketRepo.create.mockReturnValue(mockTicket());
-      ticketRepo.save.mockResolvedValue(mockTicket());
+      const ticket = mockTicket();
+      ticketRepo.create.mockReturnValue(ticket);
+      ticketRepo.save.mockResolvedValue(ticket);
+      ticketRepo.findOneBy.mockResolvedValue(ticket);
 
       const result = await service.importFromCsv(Buffer.from(csv), 1, 5);
       expect(result.created).toBe(1);
