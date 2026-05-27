@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException, forwardRef, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, IsNull } from 'typeorm';
 import { Ticket } from '../entities/ticket.entity';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { TicketDependenciesService } from '../ticket-dependencies/ticket-dependencies.service';
 import { AuditAction } from '../common/enums/audit-action.enum';
 import { AuditActor } from '../common/enums/audit-actor.enum';
 import { AuditEntityType } from '../common/enums/audit-entity-type.enum';
@@ -25,6 +26,8 @@ export class TicketsService {
   constructor(
     @InjectRepository(Ticket) private readonly ticketRepo: Repository<Ticket>,
     private readonly auditLogsService: AuditLogsService,
+    @Inject(forwardRef(() => TicketDependenciesService))
+    private readonly ticketDependenciesService: TicketDependenciesService,
   ) {}
 
   findAll(projectId: number): Promise<Ticket[]> {
@@ -70,6 +73,11 @@ export class TicketsService {
 
     if (dto.version !== undefined && dto.version !== ticket.version) {
       throw new ConflictException('Ticket was modified by another request');
+    }
+
+    if (dto.status === TicketStatus.DONE) {
+      const blocked = await this.ticketDependenciesService.hasUnresolvedBlockers(ticket.id);
+      if (blocked) throw new ConflictException('Ticket has unresolved blockers and cannot be marked DONE');
     }
 
     const { version: _v, ...rest } = dto;
