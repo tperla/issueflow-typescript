@@ -19,7 +19,7 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(dto.password, user.passwordHash))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const accessToken = this.jwtService.sign({ sub: user.id, username: user.username });
+    const accessToken = this.jwtService.sign({ sub: user.id, username: user.username, role: user.role });
     return { accessToken, tokenType: 'Bearer', expiresIn: 3600 };
   }
 

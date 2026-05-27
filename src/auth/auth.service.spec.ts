@@ -38,6 +38,7 @@ describe('AuthService', () => {
       mockUsersService.findByUsername.mockResolvedValue({
         id: 1,
         username: 'john',
+        role: UserRole.DEVELOPER,
         passwordHash: hash,
       } as User);
       mockJwtService.sign.mockReturnValue('signed-token');
@@ -45,7 +46,7 @@ describe('AuthService', () => {
       const result = await service.login({ username: 'john', password: 'correctpass' });
 
       expect(result).toEqual({ accessToken: 'signed-token', tokenType: 'Bearer', expiresIn: 3600 });
-      expect(mockJwtService.sign).toHaveBeenCalledWith({ sub: 1, username: 'john' });
+      expect(mockJwtService.sign).toHaveBeenCalledWith({ sub: 1, username: 'john', role: UserRole.DEVELOPER });
     });
 
     it('throws 401 for wrong password', async () => {

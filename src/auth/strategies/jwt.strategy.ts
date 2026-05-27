@@ -14,11 +14,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(req: any, payload: { sub: number; username: string }) {
+  async validate(req: any, payload: { sub: number; username: string; role: string }) {
     const token = req.headers?.authorization?.split(' ')[1];
     if (token && this.authService.isTokenBlacklisted(token)) {
       throw new UnauthorizedException('Token has been invalidated');
     }
-    return { id: payload.sub, username: payload.username };
+    return { id: payload.sub, username: payload.username, role: payload.role };
   }
 }
