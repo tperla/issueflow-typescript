@@ -11,7 +11,8 @@
     { "key": "userId",    "value": "", "type": "string" },
     { "key": "projectId", "value": "", "type": "string" },
     { "key": "ticketId",   "value": "", "type": "string" },
-    { "key": "commentId",  "value": "", "type": "string" }
+    { "key": "commentId",  "value": "", "type": "string" },
+    { "key": "blockerId",  "value": "", "type": "string" }
   ],
   "auth": {
     "type": "bearer",
@@ -444,6 +445,52 @@
               "host": ["{{baseUrl}}"],
               "path": ["tickets", "import"],
               "query": [{ "key": "projectId", "value": "{{projectId}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ticket Dependencies",
+      "item": [
+        {
+          "name": "List Blockers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}/dependencies",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}", "dependencies"]
+            }
+          }
+        },
+        {
+          "name": "Add Blocker",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blockerId\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}/dependencies",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}", "dependencies"]
+            }
+          }
+        },
+        {
+          "name": "Remove Blocker",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}/dependencies/{{blockerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}", "dependencies", "{{blockerId}}"]
             }
           }
         }
