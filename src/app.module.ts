@@ -10,9 +10,10 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { CommentsModule } from './comments/comments.module';
 import { TicketDependenciesModule } from './ticket-dependencies/ticket-dependencies.module';
+import { AttachmentsModule } from './attachments/attachments.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UsersModule, AuthModule, ProjectsModule, AuditLogsModule, TicketsModule, CommentsModule, TicketDependenciesModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), UsersModule, AuthModule, ProjectsModule, AuditLogsModule, TicketsModule, CommentsModule, TicketDependenciesModule, AttachmentsModule],
   controllers: [AppController],
   providers: [AppService],
 })
