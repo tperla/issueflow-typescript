@@ -4,6 +4,7 @@ import { Repository, Not, IsNull } from 'typeorm';
 import { Ticket } from '../entities/ticket.entity';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { TicketDependenciesService } from '../ticket-dependencies/ticket-dependencies.service';
+import { SchedulerService } from '../scheduler/scheduler.service';
 import { AuditAction } from '../common/enums/audit-action.enum';
 import { AuditActor } from '../common/enums/audit-actor.enum';
 import { AuditEntityType } from '../common/enums/audit-entity-type.enum';
@@ -28,6 +29,7 @@ export class TicketsService {
     private readonly auditLogsService: AuditLogsService,
     @Inject(forwardRef(() => TicketDependenciesService))
     private readonly ticketDependenciesService: TicketDependenciesService,
+    private readonly schedulerService: SchedulerService,
   ) {}
 
   findAll(projectId: number): Promise<Ticket[]> {
@@ -52,7 +54,8 @@ export class TicketsService {
       performedBy,
       actor: AuditActor.USER,
     });
-    return ticket;
+    await this.schedulerService.autoAssign(ticket);
+    return this.findOne(ticket.id);
   }
 
   async update(id: number, dto: UpdateTicketDto, performedBy: number): Promise<Ticket> {
@@ -83,8 +86,8 @@ export class TicketsService {
     const { version: _v, ...rest } = dto;
     Object.assign(ticket, rest);
 
-    if (dto.priority && dto.priority !== ticket.priority) {
-      ticket.isOverdue = ticket.dueDate ? new Date(ticket.dueDate) < new Date() : false;
+    if (dto.priority !== undefined) {
+      ticket.isOverdue = false;
     }
 
     const updated = await this.ticketRepo.save(ticket);
