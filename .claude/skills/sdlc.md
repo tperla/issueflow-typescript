@@ -37,7 +37,17 @@ After user confirms Phase 3 merged, for each task in `tasks.md`:
 2. Implement with clean code + SOLID principles
 3. Write unit and E2E tests
 4. `npm run test` and `npm run test:e2e` — verify all pass
-5. Update `issueflow-postman-collection.json` with any new endpoints added in this task (new folder, requests, and collection variables as needed)
+5. Update `issueflow-postman-collection.json`:
+   - Glob `src/**/*.controller.ts` and read each file to find new/changed routes (base path, HTTP verb, sub-path, ADMIN-only guards)
+   - Read the current collection to see what already exists
+   - For each new route not yet in the collection:
+     - Add a folder (named after the resource) or add requests to an existing folder
+     - Use `{{baseUrl}}` for the host and existing `{{variables}}` for IDs
+     - Add a `test` script on 201 responses to auto-save the new resource ID to a collection variable
+     - Use `formdata` body mode for file uploads, `raw` + `application/json` for JSON endpoints
+     - Note ADMIN-only endpoints in the request name
+   - Add any new collection-level variables needed for new ID placeholders
+   - Write the updated collection back to `issueflow-postman-collection.json`
 6. Commit and create PR → **STOP** — wait for user to merge before next task
 
 ## Rules
