@@ -37,7 +37,8 @@ After user confirms Phase 3 merged, for each task in `tasks.md`:
 2. Implement with clean code + SOLID principles
 3. Write unit and E2E tests
 4. `npm run test` and `npm run test:e2e` — verify all pass
-5. Commit and create PR → **STOP** — wait for user to merge before next task
+5. Update `issueflow-postman-collection.json` with any new endpoints added in this task (new folder, requests, and collection variables as needed)
+6. Commit and create PR → **STOP** — wait for user to merge before next task
 
 ## Rules
 - Never skip a phase without explicit user confirmation
