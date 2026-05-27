@@ -17,6 +17,7 @@
 - **FR-A1**: Login (`POST /auth/login`) with `username` and `password` → `accessToken`, `tokenType`, `expiresIn`
 - **FR-A2**: Logout (`POST /auth/logout`) — invalidates current JWT → 200 OK
 - **FR-A3**: Get current user (`GET /auth/me`) — requires valid JWT → user object
+- **FR-A4**: On startup, if no admin user exists, seed one from env vars `SEED_ADMIN_USERNAME` (default: `admin`), `SEED_ADMIN_EMAIL` (default: `admin@issueflow.dev`), `SEED_ADMIN_PASSWORD` (default: `admin123`); operation is idempotent
 
 ### 1.3 Projects
 - **FR-P1**: List all projects (`GET /projects`) → array (excludes soft-deleted)
@@ -116,6 +117,7 @@
 - **NFR-6**: All `npm run test` and `npm run test:e2e` must pass
 - **NFR-7**: Password stored as bcrypt hash; plain text passwords never persisted
 - **NFR-8**: JWT tokens expire after 1 hour; logout invalidates via in-memory blacklist
+- **NFR-11**: All API endpoints (including Users CRUD) are protected by JWT authentication; unauthenticated requests return 401
 - **NFR-9**: CSV import accumulates per-row errors and returns them without aborting the whole import
 - **NFR-10**: CSV format must correctly handle commas and quotes inside field values (RFC 4180 compliant)
 

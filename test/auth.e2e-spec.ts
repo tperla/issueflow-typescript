@@ -21,9 +21,9 @@ describe('Auth (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
     app.useGlobalFilters(new HttpExceptionFilter());
-    await app.init();
+    await app.init(); // onApplicationBootstrap seeds admin automatically
 
-    // Seed test user directly (POST /users is JWT-protected)
+    // Seed a dedicated test user directly (idempotent)
     const userRepo = moduleFixture.get<any>(getRepositoryToken(User));
     await userRepo.delete({ username: 'authuser' });
     const passwordHash = await bcrypt.hash('password123', 10);

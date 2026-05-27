@@ -1,12 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
-import * as bcrypt from 'bcrypt';
 import { AppModule } from './../src/app.module';
 import { HttpExceptionFilter } from './../src/common/filters/http-exception.filter';
-import { User } from './../src/entities/user.entity';
-import { UserRole } from './../src/common/enums/user-role.enum';
 
 describe('Users (e2e)', () => {
   let app: INestApplication;
@@ -21,25 +17,11 @@ describe('Users (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
     app.useGlobalFilters(new HttpExceptionFilter());
-    await app.init();
-
-    // Seed admin directly to bootstrap a token (POST /users is also protected)
-    const userRepo = moduleFixture.get<any>(getRepositoryToken(User));
-    await userRepo.delete({ username: 'users_admin' });
-    const passwordHash = await bcrypt.hash('admin123', 10);
-    await userRepo.save(
-      userRepo.create({
-        username: 'users_admin',
-        email: 'users_admin@test.com',
-        fullName: 'Users Admin',
-        role: UserRole.ADMIN,
-        passwordHash,
-      }),
-    );
+    await app.init(); // onApplicationBootstrap seeds admin automatically
 
     const loginRes = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ username: 'users_admin', password: 'admin123' });
+      .send({ username: 'admin', password: 'admin123' });
     authToken = loginRes.body.accessToken;
   });
 

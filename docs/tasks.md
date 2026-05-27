@@ -10,6 +10,7 @@ Each task = one branch + one PR. Follow: implement → write tests → `npm run 
 
 **Files to create/modify:**
 - `src/app.module.ts` — import all feature modules, configure TypeORM, ValidationPipe, HttpExceptionFilter
+- `src/app.service.ts` — implement `OnApplicationBootstrap`; seed default admin from env vars on startup if none exists
 - `src/common/filters/http-exception.filter.ts` — global exception filter returning `{ statusCode, message, error }`
 - `src/common/enums/` — `user-role.enum.ts`, `ticket-status.enum.ts`, `ticket-priority.enum.ts`, `ticket-type.enum.ts`, `audit-action.enum.ts`, `audit-actor.enum.ts`, `audit-entity-type.enum.ts`
 - `src/config/typeorm.config.ts` — TypeORM datasource config using `compose.yml` credentials: `host=localhost, port=5432, username=issueflow, password=issueflow, database=issueflow, synchronize=true`
@@ -23,9 +24,10 @@ Each task = one branch + one PR. Follow: implement → write tests → `npm run 
 - Global `ValidationPipe` rejects invalid input with 400
 - Global `HttpExceptionFilter` returns consistent `{ statusCode, message, error }` shape
 - All enums defined and exported
+- On first boot, an admin user is created with credentials from env vars (defaults: `admin`/`admin123`); subsequent boots are idempotent
 
 **Tests:**
-- Unit: TypeORM config loads correct values from environment
+- Unit: TypeORM config loads correct values from environment; `AppService` seeds admin when none exists and skips when one already exists
 - E2E: App bootstraps, `/auth/login` with missing body returns 400 with validation error shape
 
 ---
