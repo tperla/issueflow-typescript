@@ -41,10 +41,10 @@ All TypeORM entities use class decorators (`@Entity`, `@Column`, `@ManyToOne`, e
 ### Enums
 
 - `UserRole`: `DEVELOPER`, `ADMIN`
-- `TicketStatus`: `TODO`, `IN_PROGRESS`, `DONE`
+- `TicketStatus`: `TODO`, `IN_PROGRESS`, `IN_REVIEW`, `DONE`
 - `TicketPriority`: `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`
-- `TicketType`: `BUG`, `FEATURE`, `TASK`
-- `AuditAction`: `CREATE`, `UPDATE`, `DELETE`, `RESTORE`
+- `TicketType`: `BUG`, `FEATURE`, `TECHNICAL`
+- `AuditAction`: `CREATE`, `UPDATE`, `DELETE`, `RESTORE`, `AUTO_ASSIGN`
 - `AuditEntityType`: `USER`, `PROJECT`, `TICKET`, `COMMENT`, `ATTACHMENT`
 - `AuditActor`: `USER`, `SYSTEM`
 
@@ -105,8 +105,8 @@ Upload via `multer` (memory storage), download streamed directly from the DB col
 
 Background jobs are implemented as `@Cron`-decorated methods inside `SchedulerService`:
 
-- **Auto-escalation**: runs periodically, finds overdue non-DONE tickets and bumps priority one level (LOW→MEDIUM→HIGH→CRITICAL), logs each change via `AuditLogService` with `actor: SYSTEM`
-- **Auto-assignment**: finds unassigned tickets per project, assigns to the DEVELOPER with the fewest open tickets, logs via `AuditLogService` with `actor: SYSTEM`
+- **Auto-escalation**: runs periodically, finds overdue tickets (past `dueDate`, priority below CRITICAL) and bumps priority one level (LOW→MEDIUM→HIGH→CRITICAL); sets `isOverdue = true` when CRITICAL is reached; logs each change via `AuditLogService` with `actor: SYSTEM`; manual priority change via PATCH resets `isOverdue`
+- **Auto-assignment**: on ticket creation when `assigneeId` absent, assigns to the DEVELOPER in the project with fewest open tickets (ties broken by registration order); logs via `AuditLogService` with `actor: SYSTEM`, `action: AUTO_ASSIGN`
 
 Both methods are plain service methods — testable by calling them directly without needing to invoke the cron scheduler.
 
