@@ -14,6 +14,7 @@ export class AttachmentsController {
   constructor(private readonly attachmentsService: AttachmentsService) {}
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file', multerConfig))
   upload(
     @Param('ticketId', ParseIntPipe) ticketId: number,

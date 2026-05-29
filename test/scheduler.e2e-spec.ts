@@ -154,7 +154,7 @@ describe('Scheduler (e2e)', () => {
         .post('/tickets')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ title: 'Auto assign me', status: 'TODO', priority: 'LOW', type: 'FEATURE', projectId })
-        .expect(201);
+        .expect(200);
 
       // Some developer should be assigned (DB has other devs from prior suites; we verify assignment happened)
       expect(res.body.assigneeId).not.toBeNull();
@@ -165,7 +165,7 @@ describe('Scheduler (e2e)', () => {
         .post('/tickets')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ title: 'Manual assign', status: 'TODO', priority: 'LOW', type: 'FEATURE', projectId, assigneeId: adminId })
-        .expect(201);
+        .expect(200);
 
       expect(res.body.assigneeId).toBe(adminId);
     });
@@ -175,7 +175,7 @@ describe('Scheduler (e2e)', () => {
         .post('/tickets')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ title: 'Audit assign', status: 'TODO', priority: 'LOW', type: 'BUG', projectId })
-        .expect(201);
+        .expect(200);
 
       const logs = await request(app.getHttpServer())
         .get(`/audit-logs?entityId=${ticket.body.id}&entityType=TICKET`)

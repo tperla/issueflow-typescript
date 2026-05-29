@@ -17,6 +17,7 @@ export class TicketDependenciesController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   add(
     @Param('ticketId', ParseIntPipe) ticketId: number,
     @Body() dto: AddDependencyDto,

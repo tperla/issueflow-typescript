@@ -73,7 +73,7 @@ describe('Comments (e2e)', () => {
       .post(`/tickets/${ticketId}/comments`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ content: 'First comment' })
-      .expect(201);
+      .expect(200);
 
     expect(res.body).toMatchObject({ id: expect.any(Number), content: 'First comment' });
     commentId = res.body.id;
@@ -84,7 +84,7 @@ describe('Comments (e2e)', () => {
       .post(`/tickets/${ticketId}/comments`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ content: `Hey @comment_dev please review` })
-      .expect(201);
+      .expect(200);
 
     expect(res.body.mentionedUsers).toEqual(
       expect.arrayContaining([expect.objectContaining({ id: devId })])
@@ -96,7 +96,7 @@ describe('Comments (e2e)', () => {
       .post(`/tickets/${ticketId}/comments`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ content: `cc @COMMENT_DEV` })
-      .expect(201);
+      .expect(200);
 
     expect(res.body.mentionedUsers).toEqual(
       expect.arrayContaining([expect.objectContaining({ id: devId })])
@@ -108,7 +108,7 @@ describe('Comments (e2e)', () => {
       .post(`/tickets/${ticketId}/comments`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ content: 'Hey @nonexistentuser123' })
-      .expect(201);
+      .expect(200);
 
     expect(res.body.mentionedUsers).toEqual([]);
   });
@@ -139,7 +139,7 @@ describe('Comments (e2e)', () => {
       .post(`/tickets/${ticketId}/comments`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ content: `Hello @comment_dev` })
-      .expect(201);
+      .expect(200);
 
     const id = created.body.id;
     expect(created.body.mentionedUsers.length).toBeGreaterThan(0);
@@ -176,9 +176,11 @@ describe('Comments (e2e)', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBeGreaterThan(0);
-    res.body.forEach((c: any) => {
+    expect(res.body.data).toBeDefined();
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.total).toBeGreaterThan(0);
+    expect(res.body.page).toBe(1);
+    res.body.data.forEach((c: any) => {
       expect(c.mentionedUsers.some((u: any) => u.id === devId)).toBe(true);
     });
   });

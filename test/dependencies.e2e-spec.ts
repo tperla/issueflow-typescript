@@ -69,8 +69,8 @@ describe('TicketDependencies (e2e)', () => {
     const res = await request(app.getHttpServer())
       .post(`/tickets/${ticketAId}/dependencies`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ blockerId: ticketBId })
-      .expect(201);
+      .send({ blockedBy: ticketBId })
+      .expect(200);
 
     expect(res.body).toMatchObject({ ticketId: ticketAId, blockedById: ticketBId });
   });
@@ -89,7 +89,7 @@ describe('TicketDependencies (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/tickets/${ticketAId}/dependencies`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ blockerId: ticketAId })
+      .send({ blockedBy: ticketAId })
       .expect(400);
   });
 
@@ -97,7 +97,7 @@ describe('TicketDependencies (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/tickets/${ticketAId}/dependencies`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ blockerId: otherProjectTicketId })
+      .send({ blockedBy: otherProjectTicketId })
       .expect(400);
   });
 
@@ -106,7 +106,7 @@ describe('TicketDependencies (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/tickets/${ticketBId}/dependencies`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ blockerId: ticketAId })
+      .send({ blockedBy: ticketAId })
       .expect(409);
   });
 
@@ -154,14 +154,14 @@ describe('TicketDependencies (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/tickets/${ticketCId}/dependencies`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ blockerId: ticketBId }) // B is available
-      .expect(201);
+      .send({ blockedBy: ticketBId }) // B is available
+      .expect(200);
 
     // Try to add B blocked by C — would create C→B→C cycle
     await request(app.getHttpServer())
       .post(`/tickets/${ticketBId}/dependencies`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ blockerId: ticketCId })
+      .send({ blockedBy: ticketCId })
       .expect(409);
   });
 
@@ -189,7 +189,7 @@ describe('TicketDependencies (e2e)', () => {
   it('POST /tickets/:id/dependencies returns 401 without token', async () => {
     await request(app.getHttpServer())
       .post(`/tickets/${ticketAId}/dependencies`)
-      .send({ blockerId: ticketBId })
+      .send({ blockedBy: ticketBId })
       .expect(401);
   });
 });

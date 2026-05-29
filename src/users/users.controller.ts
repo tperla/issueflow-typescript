@@ -20,11 +20,13 @@ export class UsersController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   create(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
   }
 
   @Post('update/:userId')
+  @HttpCode(HttpStatus.OK)
   update(@Param('userId', ParseIntPipe) userId: number, @Body() dto: UpdateUserDto) {
     return this.usersService.update(userId, dto);
   }

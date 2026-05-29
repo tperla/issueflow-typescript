@@ -1,6 +1,7 @@
 import {
   Controller, Get, Post, Patch, Delete, Param, Body, Query,
   ParseIntPipe, UseGuards, Req, Res, UploadedFile, UseInterceptors,
+  HttpCode, HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
@@ -47,11 +48,13 @@ export class TicketsController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   create(@Body() dto: CreateTicketDto, @Req() req: any) {
     return this.ticketsService.create(dto, req.user.id);
   }
 
   @Post('import')
+  @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file'))
   importCsv(
     @UploadedFile() file: Express.Multer.File,
@@ -62,6 +65,7 @@ export class TicketsController {
   }
 
   @Post(':id/restore')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   restore(@Param('id', ParseIntPipe) id: number, @Req() req: any) {

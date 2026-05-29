@@ -55,7 +55,7 @@ describe('Projects (e2e)', () => {
       .post('/projects')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ name: 'Test Project', description: 'A test', ownerId })
-      .expect(201);
+      .expect(200);
 
     expect(res.body).toMatchObject({ id: expect.any(Number), name: 'Test Project' });
     projectId = res.body.id;

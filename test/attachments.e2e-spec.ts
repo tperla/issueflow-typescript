@@ -54,7 +54,7 @@ describe('Attachments (e2e)', () => {
       .post(`/tickets/${ticketId}/attachments`)
       .set('Authorization', `Bearer ${adminToken}`)
       .attach('file', Buffer.from('fake image data'), { filename: 'photo.png', contentType: 'image/png' })
-      .expect(201);
+      .expect(200);
 
     expect(res.body).toMatchObject({
       id: expect.any(Number),
@@ -71,7 +71,7 @@ describe('Attachments (e2e)', () => {
       .post(`/tickets/${ticketId}/attachments`)
       .set('Authorization', `Bearer ${adminToken}`)
       .attach('file', Buffer.from('%PDF-1.4 fake'), { filename: 'doc.pdf', contentType: 'application/pdf' })
-      .expect(201);
+      .expect(200);
 
     expect(res.body.contentType).toBe('application/pdf');
   });

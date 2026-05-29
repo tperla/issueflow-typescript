@@ -65,24 +65,24 @@ describe('TicketDependenciesService', () => {
       depRepo.create.mockReturnValue(dep);
       depRepo.save.mockResolvedValue(dep);
 
-      const result = await service.add(1, { blockerId: 2 });
+      const result = await service.add(1, { blockedBy: 2 });
       expect(result).toBe(dep);
     });
 
     it('throws BadRequestException when ticket blocks itself', async () => {
-      await expect(service.add(1, { blockerId: 1 })).rejects.toThrow(BadRequestException);
+      await expect(service.add(1, { blockedBy: 1 })).rejects.toThrow(BadRequestException);
     });
 
     it('throws NotFoundException when ticket not found', async () => {
       ticketRepo.findOneBy.mockResolvedValueOnce(null);
-      await expect(service.add(99, { blockerId: 2 })).rejects.toThrow(NotFoundException);
+      await expect(service.add(99, { blockedBy: 2 })).rejects.toThrow(NotFoundException);
     });
 
     it('throws BadRequestException for cross-project tickets', async () => {
       ticketRepo.findOneBy
         .mockResolvedValueOnce(mockTicket(1, 1))
         .mockResolvedValueOnce(mockTicket(2, 2));
-      await expect(service.add(1, { blockerId: 2 })).rejects.toThrow(BadRequestException);
+      await expect(service.add(1, { blockedBy: 2 })).rejects.toThrow(BadRequestException);
     });
 
     it('throws ConflictException when dependency already exists', async () => {
@@ -91,7 +91,7 @@ describe('TicketDependenciesService', () => {
         .mockResolvedValueOnce(mockTicket(2));
       depRepo.findBy.mockResolvedValue([]);
       depRepo.findOneBy.mockResolvedValue({ ticketId: 1, blockedById: 2 });
-      await expect(service.add(1, { blockerId: 2 })).rejects.toThrow(BadRequestException);
+      await expect(service.add(1, { blockedBy: 2 })).rejects.toThrow(BadRequestException);
     });
   });
 

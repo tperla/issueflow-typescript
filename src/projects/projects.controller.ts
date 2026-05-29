@@ -38,6 +38,7 @@ export class ProjectsController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   create(@Body() dto: CreateProjectDto, @Req() req: any) {
     return this.projectsService.create(dto, req.user.id);
   }
