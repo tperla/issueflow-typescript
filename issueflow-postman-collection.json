@@ -6,14 +6,14 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl",   "value": "http://localhost:3000", "type": "string" },
-    { "key": "token",     "value": "", "type": "string" },
-    { "key": "userId",    "value": "", "type": "string" },
-    { "key": "projectId", "value": "", "type": "string" },
-    { "key": "ticketId",   "value": "", "type": "string" },
-    { "key": "commentId",  "value": "", "type": "string" },
-    { "key": "blockerId",      "value": "", "type": "string" },
-    { "key": "attachmentId",   "value": "", "type": "string" }
+    { "key": "baseUrl",      "value": "http://localhost:3000", "type": "string" },
+    { "key": "token",        "value": "", "type": "string" },
+    { "key": "userId",       "value": "", "type": "string" },
+    { "key": "projectId",    "value": "", "type": "string" },
+    { "key": "ticketId",     "value": "", "type": "string" },
+    { "key": "commentId",    "value": "", "type": "string" },
+    { "key": "blockerId",    "value": "", "type": "string" },
+    { "key": "attachmentId", "value": "", "type": "string" }
   ],
   "auth": {
     "type": "bearer",
@@ -93,7 +93,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 201) {",
+                  "if (pm.response.code === 200) {",
                   "    const json = pm.response.json();",
                   "    pm.collectionVariables.set('userId', json.id);",
                   "    console.log('userId saved:', json.id);",
@@ -183,7 +183,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 201) {",
+                  "if (pm.response.code === 200) {",
                   "    const json = pm.response.json();",
                   "    pm.collectionVariables.set('projectId', json.id);",
                   "    console.log('projectId saved:', json.id);",
@@ -309,7 +309,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 201) {",
+                  "if (pm.response.code === 200) {",
                   "    const json = pm.response.json();",
                   "    pm.collectionVariables.set('ticketId', json.id);",
                   "    console.log('ticketId saved:', json.id);",
@@ -462,7 +462,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 201) {",
+                  "if (pm.response.code === 200) {",
                   "    const json = pm.response.json();",
                   "    pm.collectionVariables.set('attachmentId', json.id);",
                   "    console.log('attachmentId saved:', json.id);",
@@ -481,7 +481,7 @@
                   "key": "file",
                   "type": "file",
                   "src": "",
-                  "description": "Allowed: image/jpeg, image/png, image/gif, image/webp, application/pdf, text/plain, text/csv, application/zip. Max 10 MB."
+                  "description": "Allowed: image/jpeg, image/png, application/pdf, text/plain. Max 10 MB."
                 }
               ]
             },
@@ -528,7 +528,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"blockerId\": 1\n}",
+              "raw": "{\n  \"blockerId\": {{blockerId}}\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": {
@@ -556,7 +556,7 @@
       "name": "Audit Logs",
       "item": [
         {
-          "name": "List Audit Logs (ADMIN only)",
+          "name": "List Audit Logs",
           "request": {
             "method": "GET",
             "header": [],
@@ -568,7 +568,7 @@
           }
         },
         {
-          "name": "List Audit Logs – filter by entityType (ADMIN only)",
+          "name": "Filter by entityType",
           "request": {
             "method": "GET",
             "header": [],
@@ -581,7 +581,7 @@
           }
         },
         {
-          "name": "List Audit Logs – filter by action (ADMIN only)",
+          "name": "Filter by action",
           "request": {
             "method": "GET",
             "header": [],
@@ -594,28 +594,31 @@
           }
         },
         {
-          "name": "List Audit Logs – filter by actor (ADMIN only)",
+          "name": "Filter by actor",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/audit-logs?actor=USER",
+              "raw": "{{baseUrl}}/audit-logs?actor=SYSTEM",
               "host": ["{{baseUrl}}"],
               "path": ["audit-logs"],
-              "query": [{ "key": "actor", "value": "USER", "description": "USER | SYSTEM" }]
+              "query": [{ "key": "actor", "value": "SYSTEM", "description": "USER | SYSTEM" }]
             }
           }
         },
         {
-          "name": "List Audit Logs – filter by entityId (ADMIN only)",
+          "name": "Filter by entityId",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/audit-logs?entityId={{projectId}}",
+              "raw": "{{baseUrl}}/audit-logs?entityId={{ticketId}}&entityType=TICKET",
               "host": ["{{baseUrl}}"],
               "path": ["audit-logs"],
-              "query": [{ "key": "entityId", "value": "{{projectId}}" }]
+              "query": [
+                { "key": "entityId", "value": "{{ticketId}}" },
+                { "key": "entityType", "value": "TICKET" }
+              ]
             }
           }
         }
@@ -644,7 +647,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 201) {",
+                  "if (pm.response.code === 200) {",
                   "    const json = pm.response.json();",
                   "    pm.collectionVariables.set('commentId', json.id);",
                   "    console.log('commentId saved:', json.id);",
@@ -703,9 +706,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/{{userId}}/mentions",
+              "raw": "{{baseUrl}}/users/{{userId}}/mentions?page=1&pageSize=20",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "{{userId}}", "mentions"]
+              "path": ["users", "{{userId}}", "mentions"],
+              "query": [
+                { "key": "page", "value": "1", "description": "Page number (default: 1)" },
+                { "key": "pageSize", "value": "20", "description": "Items per page (default: 20)" }
+              ]
             }
           }
         }
