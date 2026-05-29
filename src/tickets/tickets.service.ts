@@ -44,13 +44,9 @@ export class TicketsService {
 
   async create(dto: CreateTicketDto, performedBy: number): Promise<Ticket> {
     const isOverdue = dto.dueDate ? new Date(dto.dueDate) < new Date() : false;
-    let ticket: Ticket;
-    try {
-      ticket = await this.ticketRepo.save(this.ticketRepo.create({ ...dto, isOverdue }));
-    } catch (err: any) {
-      if (err.code === '23503') throw new BadRequestException('Referenced project or assignee does not exist');
-      throw err;
-    }
+    const ticket = await this.ticketRepo.save(
+      this.ticketRepo.create({ ...dto, isOverdue }),
+    );
     await this.auditLogsService.log({
       action: AuditAction.CREATE,
       entityType: AuditEntityType.TICKET,
