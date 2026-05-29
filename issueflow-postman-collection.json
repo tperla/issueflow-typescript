@@ -528,7 +528,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"blockerId\": {{blockerId}}\n}",
+              "raw": "{\n  \"blockedBy\": {{blockerId}}\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": {

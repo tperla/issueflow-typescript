@@ -21,7 +21,7 @@ export class TicketDependenciesService {
   }
 
   async add(ticketId: number, dto: AddDependencyDto): Promise<TicketDependency> {
-    const { blockerId } = dto;
+    const blockerId = dto.blockedBy;
 
     if (ticketId === blockerId) {
       throw new BadRequestException('A ticket cannot block itself');
