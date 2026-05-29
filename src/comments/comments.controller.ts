@@ -1,6 +1,7 @@
 import {
   Controller, Get, Post, Patch, Delete,
   Param, Body, ParseIntPipe, UseGuards, Req,
+  HttpCode, HttpStatus,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -18,6 +19,7 @@ export class CommentsController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   create(
     @Param('ticketId', ParseIntPipe) ticketId: number,
     @Body() dto: CreateCommentDto,

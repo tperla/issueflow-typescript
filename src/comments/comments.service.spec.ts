@@ -62,7 +62,10 @@ describe('CommentsService', () => {
     innerJoin: jest.fn().mockReturnThis(),
     leftJoinAndSelect: jest.fn().mockReturnThis(),
     orderBy: jest.fn().mockReturnThis(),
+    skip: jest.fn().mockReturnThis(),
+    take: jest.fn().mockReturnThis(),
     getMany: jest.fn().mockResolvedValue([]),
+    getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
   };
 
   beforeEach(async () => {
@@ -186,11 +189,11 @@ describe('CommentsService', () => {
   });
 
   describe('findMentionsByUser', () => {
-    it('returns comments mentioning the user', async () => {
+    it('returns paginated comments mentioning the user', async () => {
       const comments = [mockComment()];
-      qbMock.getMany.mockResolvedValue(comments);
-      const result = await service.findMentionsByUser(1);
-      expect(result).toBe(comments);
+      qbMock.getManyAndCount.mockResolvedValue([comments, 1]);
+      const result = await service.findMentionsByUser(1, 1, 20);
+      expect(result).toEqual({ data: comments, total: 1, page: 1 });
     });
   });
 });

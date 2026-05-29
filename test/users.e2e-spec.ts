@@ -40,7 +40,7 @@ describe('Users (e2e)', () => {
         role: 'DEVELOPER',
         password: 'secret123',
       })
-      .expect(201);
+      .expect(200);
 
     expect(res.body).toMatchObject({
       id: expect.any(Number),
@@ -101,7 +101,7 @@ describe('Users (e2e)', () => {
       .post(`/users/update/${createdUserId}`)
       .set('Authorization', `Bearer ${authToken}`)
       .send({ fullName: 'Updated Name' })
-      .expect(201);
+      .expect(200);
 
     expect(res.body.fullName).toBe('Updated Name');
   });

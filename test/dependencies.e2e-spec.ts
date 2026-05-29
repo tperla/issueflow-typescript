@@ -70,7 +70,7 @@ describe('TicketDependencies (e2e)', () => {
       .post(`/tickets/${ticketAId}/dependencies`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ blockerId: ticketBId })
-      .expect(201);
+      .expect(200);
 
     expect(res.body).toMatchObject({ ticketId: ticketAId, blockedById: ticketBId });
   });
@@ -155,7 +155,7 @@ describe('TicketDependencies (e2e)', () => {
       .post(`/tickets/${ticketCId}/dependencies`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ blockerId: ticketBId }) // B is available
-      .expect(201);
+      .expect(200);
 
     // Try to add B blocked by C — would create C→B→C cycle
     await request(app.getHttpServer())

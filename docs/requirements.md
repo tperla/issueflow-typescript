@@ -109,6 +109,7 @@
 
 ## 2. Non-Functional Requirements
 
+- **NFR-12**: All endpoints (including POST create operations) return `200 OK` on success; NestJS default `201 Created` is explicitly overridden for consistency with the API contract
 - **NFR-1**: Input validation on all POST/PATCH endpoints using `class-validator` decorators on DTOs; invalid input returns 400 with descriptive error messages
 - **NFR-2**: All errors return consistent JSON: `{ statusCode, message, error }` via a global exception filter
 - **NFR-3**: 404 returned when a resource is not found

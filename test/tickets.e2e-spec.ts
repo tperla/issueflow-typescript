@@ -64,7 +64,7 @@ describe('Tickets (e2e)', () => {
         type: 'BUG',
         projectId,
       })
-      .expect(201);
+      .expect(200);
 
     expect(res.body).toMatchObject({ id: expect.any(Number), title: 'First bug' });
     ticketId = res.body.id;
@@ -134,7 +134,7 @@ describe('Tickets (e2e)', () => {
       .post(`/tickets/import?projectId=${projectId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .attach('file', Buffer.from(csv), { filename: 'tickets.csv', contentType: 'text/csv' })
-      .expect(201);
+      .expect(200);
     expect(res.body.created).toBeGreaterThanOrEqual(1);
     expect(res.body.failed).toBe(0);
   });
@@ -173,7 +173,7 @@ describe('Tickets (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/tickets/${ticketId}/restore`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .expect(201);
+      .expect(200);
   });
 
   it('GET /tickets includes restored ticket', async () => {

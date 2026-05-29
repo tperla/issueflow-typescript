@@ -36,14 +36,22 @@ export class CommentsService {
     return comment;
   }
 
-  async findMentionsByUser(userId: number): Promise<Comment[]> {
-    return this.commentRepo
+  async findMentionsByUser(
+    userId: number,
+    page = 1,
+    pageSize = 20,
+  ): Promise<{ data: Comment[]; total: number; page: number }> {
+    const qb = this.commentRepo
       .createQueryBuilder('c')
       .innerJoin('c.mentionedUsers', 'u', 'u.id = :userId', { userId })
       .leftJoinAndSelect('c.mentionedUsers', 'mu')
       .leftJoinAndSelect('c.author', 'a')
-      .orderBy('c.createdAt', 'ASC')
-      .getMany();
+      .orderBy('c.createdAt', 'DESC')
+      .skip((page - 1) * pageSize)
+      .take(pageSize);
+
+    const [data, total] = await qb.getManyAndCount();
+    return { data, total, page };
   }
 
   async create(ticketId: number, dto: CreateCommentDto, authorId: number): Promise<Comment> {
