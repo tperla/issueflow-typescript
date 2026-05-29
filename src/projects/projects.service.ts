@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, IsNull } from 'typeorm';
 import { Project } from '../entities/project.entity';
@@ -30,7 +30,13 @@ export class ProjectsService {
   }
 
   async create(dto: CreateProjectDto, performedBy: number): Promise<Project> {
-    const project = await this.projectRepo.save(this.projectRepo.create(dto));
+    let project: Project;
+    try {
+      project = await this.projectRepo.save(this.projectRepo.create(dto));
+    } catch (err: any) {
+      if (err.code === '23503') throw new BadRequestException(`Owner with id ${dto.ownerId} does not exist`);
+      throw err;
+    }
     await this.auditLogsService.log({
       action: AuditAction.CREATE,
       entityType: AuditEntityType.PROJECT,
