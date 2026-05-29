@@ -23,6 +23,7 @@ export class CommentsService {
     return this.commentRepo.find({
       where: { ticketId },
       relations: ['author', 'mentionedUsers'],
+      select: { mentionedUsers: { id: true, username: true, fullName: true } },
       order: { createdAt: 'ASC' },
     });
   }
@@ -31,6 +32,7 @@ export class CommentsService {
     const comment = await this.commentRepo.findOne({
       where: { id },
       relations: ['author', 'mentionedUsers'],
+      select: { mentionedUsers: { id: true, username: true, fullName: true } },
     });
     if (!comment) throw new NotFoundException(`Comment ${id} not found`);
     return comment;
@@ -44,7 +46,8 @@ export class CommentsService {
     const qb = this.commentRepo
       .createQueryBuilder('c')
       .innerJoin('c.mentionedUsers', 'u', 'u.id = :userId', { userId })
-      .leftJoinAndSelect('c.mentionedUsers', 'mu')
+      .leftJoin('c.mentionedUsers', 'mu')
+      .addSelect(['mu.id', 'mu.username', 'mu.fullName'])
       .leftJoinAndSelect('c.author', 'a')
       .orderBy('c.createdAt', 'DESC')
       .skip((page - 1) * pageSize)
